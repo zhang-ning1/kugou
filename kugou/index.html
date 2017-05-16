@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <title></title>
+    <link rel="stylesheet" href="public/css/swiper.min.css">
+    <link rel="stylesheet" href="public/css/common.css">
+    <link rel="stylesheet" href="public/css/reset.css">
+    <link rel="stylesheet" href="public/css/style.css">
+</head>
+<body ng-app="app">
+<header class="header">
+    <img src="public/images/logo/logo.png" alt="">
+    <span>下载酷狗</span>
+    <a href="#"><img src="public/images/logo/search.png" alt=""></a>
+</header>
+<nav class="nav">
+    <ul>
+        <li class="on"><a href="#/song">新歌</a></li>
+        <li><a href="#/ranking">排行</a></li>
+        <li><a href="#/list">歌单</a></li>
+        <li><a href="#/bulbul">歌手</a></li>
+    </ul>
+</nav>
+<section class="section">
+    <div ng-view></div>
+</section>
+<script type="text/javascript" src="public/js/swiper.min.js"></script>
+<script type="text/javascript" src="public/js/angular.js"></script>
+<script type="text/javascript" src="public/js/angular-route.js"></script>
+<script type="text/javascript">
+
+    var app=angular.module("app",["ngRoute"]);
+    function all($http,$q,url){
+        var dfd=$q.defer();
+            $http.get(url)
+                .success(function(data){
+                    dfd.resolve(data);
+                });
+        return dfd.promise;
+    }
+    app.config(function($routeProvider){
+        $routeProvider
+                .when("/song",{
+                    templateUrl:"views/song.html",
+                    controller:function($scope,prepare){
+                        $scope.list=prepare;
+                        new Swiper(".banner",{
+                            autoplay:1000
+                        });
+                    },
+                    resolve:{
+                        prepare:function($http,$q){
+                            return all($http,$q,"data/data2.json");
+                        }
+                    }
+                })
+                .when("/ranking",{
+                    templateUrl:"views/ranking.html",
+                    controller:function($scope,prepare){
+                        $scope.list1=prepare;
+                    },
+                    resolve:{
+                        prepare:function($http,$q){
+                            return all($http,$q,"data/data1.json");
+                        }
+                    }
+                })
+                .when("/list",{
+                    templateUrl:"views/list.html",
+                    controller:function($scope,prepare){
+                        $scope.list2=prepare;
+                    },
+                    resolve:{
+                        prepare:function($http,$q){
+                            return all($http,$q,"data/data.json");
+                        }
+                    }
+                })
+                .when("/bulbul",{
+                    templateUrl:"views/bulbul.html"
+                })
+                .otherwise("/song");
+    })
+</script>
+</body>
+</html>
